@@ -10,6 +10,7 @@ subtest 'basic' => sub {
   $url->url('http://roger:foo@example.test/bar/baz?x=1#frag');
 
   is( $url->url, 'http://roger:foo@example.test/bar/baz?x=1#frag', 'get whole URL' );
+  is( "$url",    'http://roger:foo@example.test/bar/baz?x=1#frag', 'get whole URL by stringifiying' );
 
   is( $url->scheme,   'http',         'get scheme'   );
   is( $url->user,     'roger',        'get user'     );

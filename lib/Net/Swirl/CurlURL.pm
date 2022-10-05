@@ -7,6 +7,9 @@ package Net::Swirl::CurlURL {
   use FFI::Platypus 2.00;
   use Exporter qw( import );
   use experimental qw( signatures postderef );
+  use overload
+      '""' => sub { shift->url },
+      bool => sub { 1 }, fallback => 1;
 
 # ABSTRACT: Perl interface to curl's URL object
 
