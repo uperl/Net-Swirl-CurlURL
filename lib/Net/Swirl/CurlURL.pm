@@ -89,5 +89,3 @@ package Net::Swirl::CurlURL {
 }
 
 1;
-
-
