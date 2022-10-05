@@ -27,6 +27,17 @@ subtest 'basic' => sub {
 
 subtest 'exceptions' => sub {
 
+  subtest 'bad scheme?' => sub {
+
+    is
+      dies { Net::Swirl::CurlURL->new->scheme('bogus') },
+      object {
+        call [ isa => 'Net::Swirl::CurlURL::Exception' ] => T();
+        call code => Net::Swirl::CurlURL::CURLUE_UNSUPPORTED_SCHEME;
+      };
+
+  };
+
   foreach my $name (sort keys %Net::Swirl::CurlURL::)
   {
     next unless $name =~ /^CURLUE_/;
@@ -53,6 +64,32 @@ subtest 'exceptions' => sub {
   }
 };
 
+subtest 'import' => sub {
+
+  package Test1 {
+    use Net::Swirl::CurlURL ();
+    Test2::V0::not_imported_ok 'CURLUE_OK';
+    Test2::V0::not_imported_ok 'CURLU_DEFAULT_PORT';
+  }
+
+  package Test2 {
+    use Net::Swirl::CurlURL qw( :all );
+    Test2::V0::imported_ok 'CURLUE_OK';
+    Test2::V0::imported_ok 'CURLU_DEFAULT_PORT';
+  }
+
+  package Test3 {
+    use Net::Swirl::CurlURL qw( :errorcode );
+    Test2::V0::imported_ok 'CURLUE_OK';
+    Test2::V0::not_imported_ok 'CURLU_DEFAULT_PORT';
+  }
+
+  package Test4 {
+    use Net::Swirl::CurlURL qw( :flags );
+    Test2::V0::not_imported_ok 'CURLUE_OK';
+    Test2::V0::imported_ok 'CURLU_DEFAULT_PORT';
+  }
+
+};
+
 done_testing;
-
-
