@@ -5,6 +5,7 @@ package Net::Swirl::CurlURL {
   use 5.020;
   use Net::Swirl::CurlURL::FFI;
   use FFI::Platypus 2.00;
+  use Exporter qw( import );
   use experimental qw( signatures postderef );
 
 # ABSTRACT: Perl interface to curl's URL object
@@ -12,14 +13,14 @@ package Net::Swirl::CurlURL {
 =head1 SYNOPSIS
 
  use Net::Swirl::CurlURL;
-
+ 
  my $url = Net::Swirl::CurlURL->new;
  $url->scheme('https');
  $url->host('localhost');
-
+ 
  say $url->url;    # http://localhost
  say "$url";       # http://localhost
-
+ 
  say $url->host;   # localhost
 
 =head1 DESCRIPTION
@@ -111,6 +112,23 @@ Returns the fragment.
 
 Returns the zoneid.
 
+=head1 EXCEPTIONS
+
+If an error is detected, it will be thrown as a C<Net::Swirl::CurlURL::Exception>.
+This is a subclass of L<Exception::FFI::ErrorCode>.  The error codes can be imported
+from this module with the C<:errorcode> tag.  Example:
+
+ use Net::Swirl::CurlURL qw( :errorcode );
+ try {
+   my $url = Net::Swirl::CurlURL->new;
+   $url->scheme('bogus');
+ } catch ($e) {
+   if($e isa Net::Swirl::CurlURL::Exception) {
+     if($e->code == CURLUE_UNSUPPORTED_SCHEME) {
+     }
+   }
+ }
+
 =cut
 
   my $ffi = FFI::Platypus->new(
@@ -160,7 +178,7 @@ Returns the zoneid.
   $ffi->attach( [ dup => 'clone' ] => ['CURLU'] => 'CURLU' );
 
   $ffi->attach( [ get => '_get' ] => ['CURLU','enum','string*','uint'] => 'enum');
-  $ffi->attach( [ set => '_set' ] => ['CURLU','enum','string','uint' ] => 'enum');
+  $ffi->attach( [ set => '_set' ] => ['CURLU','enum','string', 'uint'] => 'enum');
 
   {
     my $count = 0;
@@ -182,6 +200,27 @@ Returns the zoneid.
       *{$name} = $code;
     }
   }
+
+  use constant {
+    CURLU_DEFAULT_PORT       => 1<<0,
+    CURLU_NO_DEFAULT_PORT    => 1<<1,
+    CURLU_DEFAULT_SCHEME     => 1<<2,
+    CURLU_NON_SUPPORT_SCHEME => 1<<3,
+    CURLU_PATH_AS_IS         => 1<<4,
+    CURLU_DISALLOW_USER      => 1<<5,
+    CURLU_URLDECODE          => 1<<6,
+    CURLU_URLENCODE          => 1<<7,
+    CURLU_APPENDQUERY        => 1<<8,
+    CURLU_GUESS_SCHEME       => 1<<9,
+    CURLU_NO_AUTHORITY       => 1<<10,
+  };
+
+  our @EXPORT_OK   = grep /^(CURLUE?_)/, sort keys %Net::Swirl::CurlURL::;
+  our %EXPORT_TAGS = (
+    all       => \@EXPORT_OK,
+    errorcode => [ grep /^CURLUE_/, @EXPORT_OK ],
+    flags     => [ grep /^CURLU_/ , @EXPORT_OK ],
+  );
 
 }
 

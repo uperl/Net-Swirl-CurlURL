@@ -132,6 +132,25 @@ my $zoneid = $url->zoneid;
 
 Returns the zoneid.
 
+# EXCEPTIONS
+
+If an error is detected, it will be thrown as a `Net::Swirl::CurlURL::Exception`.
+This is a subclass of [Exception::FFI::ErrorCode](https://metacpan.org/pod/Exception::FFI::ErrorCode).  The error codes can be imported
+from this module with the `:errorcode` tag.  Example:
+
+```perl
+use Net::Swirl::CurlURL qw( :errorcode );
+try {
+  my $url = Net::Swirl::CurlURL->new;
+  $url->scheme('bogus');
+} catch ($e) {
+  if($e isa Net::Swirl::CurlURL::Exception) {
+    if($e->code == CURLUE_UNSUPPORTED_SCHEME) {
+    }
+  }
+}
+```
+
 # SEE ALSO
 
 - [Net::Swirl::CurlEasy](https://metacpan.org/pod/Net::Swirl::CurlEasy)
