@@ -11,6 +11,7 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Alien::curl
+  Exception::FFI::ErrorCode
   ExtUtils::MakeMaker
   FFI::CheckLib
   FFI::Platypus
