@@ -11,37 +11,105 @@ package Net::Swirl::CurlURL {
 
 =head1 SYNOPSIS
 
+ use Net::Swirl::CurlURL;
+
+ my $url = Net::Swirl::CurlURL->new;
+ $url->scheme('https');
+ $url->host('localhost');
+
+ say $url->url;    # http://localhost
+ say "$url";       # http://localhost
+
+ say $url->host;   # localhost
+
 =head1 DESCRIPTION
+
+This is an interface to C<libcurl>'s URL API.  It may be useful in
+combination with L<Net::Swirl::CurlEasy>, which has options that will
+take objects of this class.
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
+ my $url = Net::Swirl::CurlURL->new;
+
+Creates a new instance of the class.
+
 =head1 METHODS
 
 =head2 clone
 
+ my $url2 = $url->clone;
+
+Creates a new instance of the class, with the same values.
+
 =head2 url
+
+ my $string = $url->url;
+ my $string = "$url";
+
+Returns the stringified version of the URL.
 
 =head2 scheme
 
+ my $scheme = $url->scheme;
+
+Returns the scheme.
+
 =head2 user
+
+ my $user = $url->user;
+
+Returns the user.
 
 =head2 password
 
+ my $pass = $url->password;
+
+Returns the password.
+
 =head2 options
+
+ my $options = $url->options;
+
+Returns the options.
 
 =head2 host
 
+ my $host = $url->host;
+
+Returns the host.
+
 =head2 port
+
+ my $port = $url->port;
+
+Returns the port.
 
 =head2 path
 
+ my $path = $url->path;
+
+Returns the path.
+
 =head2 query
+
+ my $query = $url->query;
+
+Returns the query.
 
 =head2 fragment
 
+ my $fragment = $url->fragment;
+
+Returns the fragment.
+
 =head2 zoneid
+
+ my $zoneid = $url->zoneid;
+
+Returns the zoneid.
 
 =cut
 
@@ -118,3 +186,13 @@ package Net::Swirl::CurlURL {
 }
 
 1;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Net::Swirl::CurlEasy>
+
+=back
+
+=cut
