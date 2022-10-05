@@ -112,6 +112,15 @@ Returns the fragment.
 
 Returns the zoneid.
 
+=head2 flags
+
+ my $old = $url->flags;
+ $url->flags($new);
+
+Get or set the flags.  The flags are bit mask that can be or'd together.  Symbolic
+constants for the flags can be exported from this module using the C<:flags> import
+tag.
+
 =head1 EXCEPTIONS
 
 If an error is detected, it will be thrown as a C<Net::Swirl::CurlURL::Exception>.
@@ -130,6 +139,8 @@ from this module with the C<:errorcode> tag.  Example:
  }
 
 =cut
+
+  our %flags;
 
   my $ffi = FFI::Platypus->new(
       api => 2,
@@ -174,11 +185,26 @@ from this module with the C<:errorcode> tag.  Example:
   }
 
   $ffi->attach( new => [] => 'CURLU' );
-  $ffi->attach( [ cleanup => 'DESTROY' ] => ['CURLU'] );
-  $ffi->attach( [ dup => 'clone' ] => ['CURLU'] => 'CURLU' );
+
+  $ffi->attach( [ cleanup => 'DESTROY' ] => ['CURLU'] => sub ($xsub, $self) {
+    delete $flags{$$self};
+    $xsub->($self);
+  });
+
+  $ffi->attach( [ dup => 'clone' ] => ['CURLU'] => 'CURLU' => sub ($xsub, $self) {
+    my $new = $xsub->($self);
+    $flags{$$new} = $flags{$$self};
+    $new;
+  });
 
   $ffi->attach( [ get => '_get' ] => ['CURLU','enum','string*','uint'] => 'enum');
   $ffi->attach( [ set => '_set' ] => ['CURLU','enum','string', 'uint'] => 'enum');
+
+  sub flags ($self, $new=undef)
+  {
+    $flags{$$self} = $new if defined $new;
+    $flags{$$self}
+  }
 
   {
     my $count = 0;
@@ -188,10 +214,10 @@ from this module with the C<:errorcode> tag.  Example:
       my $code = sub {
         my $self = shift;
         if(@_) {
-          my $code = _set($self, $id, $_[0], 0);
+          my $code = _set($self, $id, $_[0], $flags{$$self});
           Net::Swirl::CurlURL::Exception->throw(code => $code ) if $code != 0;
         }
-        my $code = _get($self, $id, \my $value, 0);
+        my $code = _get($self, $id, \my $value, $flags{$$self});
         Net::Swirl::CurlURL::Exception->throw(code => $code ) if $code != 0;
         $value;
       };

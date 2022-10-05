@@ -23,6 +23,13 @@ subtest 'basic' => sub {
 
   is( $url->url, 'http://roger:foo@another.test/bar/baz?x=1#frag', 'get whole URL after modification' );
 
+  $url->flags(Net::Swirl::CurlURL::CURLU_NON_SUPPORT_SCHEME);
+  ok lives { $url->scheme('bogus') }, 'CURLU_NON_SUPPORT_SCHEME does not mind invalid scheme';
+
+  my $url2 = $url->clone;
+
+  ok lives { $url2->scheme('bogus') }, 'CURLU_NON_SUPPORT_SCHEME does not mind invalid scheme after clone';
+
 };
 
 subtest 'exceptions' => sub {
@@ -38,9 +45,8 @@ subtest 'exceptions' => sub {
 
   };
 
-  foreach my $name (sort keys %Net::Swirl::CurlURL::)
+  foreach my $name (sort { Net::Swirl::CurlURL->$a <=> Net::Swirl::CurlURL->$b } grep /^CURLUE_/, keys %Net::Swirl::CurlURL::)
   {
-    next unless $name =~ /^CURLUE_/;
     subtest $name => sub {
 
       my $code = Net::Swirl::CurlURL->$name;

@@ -132,6 +132,17 @@ my $zoneid = $url->zoneid;
 
 Returns the zoneid.
 
+## flags
+
+```perl
+my $old = $url->flags;
+$url->flags($new);
+```
+
+Get or set the flags.  The flags are bit mask that can be or'd together.  Symbolic
+constants for the flags can be exported from this module using the `:flags` import
+tag.
+
 # EXCEPTIONS
 
 If an error is detected, it will be thrown as a `Net::Swirl::CurlURL::Exception`.
