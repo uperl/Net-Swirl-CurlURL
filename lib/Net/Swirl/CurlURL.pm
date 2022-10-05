@@ -56,6 +56,37 @@ package Net::Swirl::CurlURL {
       ? 'curl_url'
       : "curl_url_$name" });
 
+  package Net::Swirl::CurlURL::Exception {
+    use Exception::FFI::ErrorCode
+      const_class => 'Net::Swirl::CurlURL',
+      codes => {
+        CURLUE_OK                   => 0,
+        CURLUE_BAD_HANDLE           => 1,
+        CURLUE_BAD_PARTPOINTER      => 2,
+        CURLUE_MALFORMED_INPUT      => 3,
+        CURLUE_BAD_PORT_NUMBER      => 4,
+        CURLUE_UNSUPPORTED_SCHEME   => 5,
+        CURLUE_URLDECODE            => 6,
+        CURLUE_OUT_OF_MEMORY        => 7,
+        CURLUE_USER_NOT_ALLOWED     => 8,
+        CURLUE_UNKNOWN_PART         => 9,
+        CURLUE_NO_SCHEME            => 10,
+        CURLUE_NO_USER              => 11,
+        CURLUE_NO_PASSWORD          => 12,
+        CURLUE_NO_OPTIONS           => 13,
+        CURLUE_NO_HOST              => 14,
+        CURLUE_NO_PORT              => 15,
+        CURLUE_NO_QUERY             => 16,
+        CURLUE_NO_FRAGMENT          => 17,
+      };
+    if($ffi->find_symbol('strerror'))
+    {
+      $ffi->attach( strerror => ['enum'] => 'string' => sub ($xsub, $self) {
+        $xsub->($self->code);
+      });
+    }
+  }
+
   $ffi->attach( new => [] => 'CURLU' );
   $ffi->attach( [ cleanup => 'DESTROY' ] => ['CURLU'] );
   $ffi->attach( [ dup => 'clone' ] => ['CURLU'] => 'CURLU' );
@@ -72,12 +103,10 @@ package Net::Swirl::CurlURL {
         my $self = shift;
         if(@_) {
           my $code = _set($self, $id, $_[0], 0);
-          # TODO: exception class
-          die "set failed with $code (id=$id)" if $code != 0;
+          Net::Swirl::CurlURL::Exception->throw(code => $code ) if $code != 0;
         }
         my $code = _get($self, $id, \my $value, 0);
-        # TODO: exception class
-        die "get failed with $code (id=$id)" if $code != 0;
+        Net::Swirl::CurlURL::Exception->throw(code => $code ) if $code != 0;
         $value;
       };
       $count++;
