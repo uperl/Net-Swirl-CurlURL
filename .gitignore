@@ -2,4 +2,7 @@ Net-Swirl-CurlURL-*
 /.build/
 *.swp
 
-
+/Net-Swirl-CurlURL-*
+/.build
+*.old
+*.orig
